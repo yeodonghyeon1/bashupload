@@ -17,7 +17,6 @@ a shell and `curl`, but:
 The tool is built around two assumptions that are almost always true on
 a fresh Linux system:
 
-- Python 3 is already installed → the server has zero dependencies.
 - `curl` is already installed → the client needs no install, no shell
   functions, no aliases, no script `source`-ing.
 
