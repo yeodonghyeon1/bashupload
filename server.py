@@ -135,6 +135,7 @@ class Handler(BaseHTTPRequestHandler):
                 f'bashupload - pure curl usage\n\n'
                 f'  upload:   curl -T FILE http://{host}/\n'
                 f'  download: curl -O http://{host}/FILE\n'
+                f'  delete:   curl -X DELETE http://{host}/FILE\n'
                 f'  list:     curl http://{host}/\n'
                 f'  help:     curl http://{host}/help\n\n'
                 f'same file (by name or content) is rejected with HTTP 409.\n'
@@ -248,7 +249,29 @@ class Handler(BaseHTTPRequestHandler):
         self.do_PUT()
 
     def do_DELETE(self):
-        self._send(405, 'Delete not allowed\n')
+        path = unquote(self.path.lstrip('/'))
+        name = safe_name(path)
+        if not name:
+            self._send(400, 'Invalid filename\n')
+            return
+        fp = os.path.join(UPLOAD_DIR, name)
+        if not os.path.isfile(fp):
+            self._send(404, f'Not found: {name}\n')
+            return
+        try:
+            os.remove(fp)
+        except OSError as e:
+            self._send(500, f'Delete failed: {e}\n')
+            return
+        # also drop the hash index entry so a future re-upload of the same
+        # content is not blocked by stale dedup state
+        hashes = load_hashes()
+        stale = [d for d, n in hashes.items() if n == name]
+        if stale:
+            for d in stale:
+                hashes.pop(d, None)
+            save_hashes(hashes)
+        self._send(200, f'Deleted: {name}\n')
 
     def _drain(self, length):
         remaining = length

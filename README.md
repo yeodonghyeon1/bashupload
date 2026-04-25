@@ -107,6 +107,9 @@ curl -T app.log http://HOST:16261/
 # Download
 curl -O http://HOST:16261/app.log
 
+# Delete
+curl -X DELETE http://HOST:16261/app.log
+
 # List files
 curl http://HOST:16261/
 
@@ -155,5 +158,7 @@ size: 1 GB (`MAX_SIZE`).
   you don't want scripts on the server).
 - No authentication. If you expose the service to the internet, restrict
   access via VPN, firewall, or a reverse proxy.
-- `DELETE` is disabled. To delete files, manipulate `uploads/` directly on
-  the host.
+- `DELETE` is **enabled** (`curl -X DELETE http://HOST:port/FILE`). With
+  no auth in front of the server, **anyone who can reach the port can
+  delete files** — keep this in mind before exposing it to the open
+  internet.
