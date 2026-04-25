@@ -14,7 +14,7 @@ a shell and `curl`, but:
 - **no `apt`/`pip`/install rights** (so you can't pull in `scp` servers,
   `rsync` daemons, MinIO, syncthing, or any third-party uploader).
 
-The tool is built around two assumptions that are almost always true on
+The tool is built one assumptions that are almost always true on
 a fresh Linux system:
 
 - `curl` is already installed → the client needs no install, no shell
