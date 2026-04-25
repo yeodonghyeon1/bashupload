@@ -5,6 +5,27 @@ standard library only** (no `apt`/`pip` install required), and the client is
 just a one-liner using the standard `curl` shipped with every Linux box (no
 need to edit `bashrc` or `source` any script).
 
+## Why this exists
+
+Designed for **minimal terminal-only environments** — boxes where you have
+a shell and `curl`, but:
+
+- **no GUI** (so a web upload page is useless — the user can't see it),
+- **no `apt`/`pip`/install rights** (so you can't pull in `scp` servers,
+  `rsync` daemons, MinIO, syncthing, or any third-party uploader).
+
+The tool is built around two assumptions that are almost always true on
+a fresh Linux system:
+
+- Python 3 is already installed → the server has zero dependencies.
+- `curl` is already installed → the client needs no install, no shell
+  functions, no aliases, no script `source`-ing.
+
+That's why the client is one line of plain `curl` and the server is a
+single `.py` file. If those constraints don't apply to you (you have a
+browser, you can install packages, you have admin rights), a normal web
+file server is probably a better fit.
+
 ## Files
 
 - `server.py` — HTTP server (stdlib only)
@@ -38,6 +59,43 @@ pop up an "Open with..." dialog. On Windows, use `start.bat` or
 
 To run in the background, use `systemd` / `nohup` / `tmux` / a Windows
 service, etc.
+
+## Network setup
+
+### Local network (LAN)
+
+No setup needed. Run the server, then point clients at the host's LAN
+IP — they just need to be on the same network (same Wi-Fi, same office
+LAN, etc.).
+
+```bash
+# on the server:
+python server.py
+
+# from any machine in the same network:
+curl -T file.log http://192.168.x.y:16261/
+```
+
+Find the server's LAN IP with `ip a` / `ifconfig` / `ipconfig`.
+
+### External network (internet)
+
+The server host must have a **stable, externally-reachable address**.
+Two common ways:
+
+- **Port forwarding on your router.** Open the chosen port (e.g. 16261)
+  in the router's admin panel and forward it to the server machine's
+  LAN IP. Works with consumer ISPs that hand out a routable IPv4. Since
+  consumer IPs are usually dynamic, pair this with a DDNS service (e.g.
+  DuckDNS) so you don't have to re-share the IP whenever it changes.
+- **Run on a host with a static public IP.** A cloud VM (AWS / GCP /
+  any cheap VPS) or an office server on a fixed-line connection
+  already has a permanent public address — no router config needed.
+  Just make sure the cloud firewall / security group allows inbound
+  TCP on your port.
+
+Either way, **read the security notes below before exposing the service
+to the open internet** — there is no built-in authentication.
 
 ## Client usage (plain curl)
 
