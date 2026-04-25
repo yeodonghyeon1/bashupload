@@ -32,7 +32,7 @@ ALLOWED_EXTS = {
     # video
     '.mp4', '.mov', '.avi', '.mkv', '.webm', '.m4v',
 }
-MAX_SIZE = 200 * 1024 * 1024  # 200MB
+MAX_SIZE = 1024 * 1024 * 1024  # 1GB
 SAFE_NAME_RE = re.compile(r'^[A-Za-z0-9._\-]+$')
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)

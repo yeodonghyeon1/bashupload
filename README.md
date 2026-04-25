@@ -87,7 +87,7 @@ The response body always names the existing file that caused the conflict.
 - **Video**: `.mp4 .mov .avi .mkv .webm .m4v`
 
 Edit `ALLOWED_EXTS` in `server.py` to change this list. Maximum upload
-size: 200 MB (`MAX_SIZE`).
+size: 1 GB (`MAX_SIZE`).
 
 ## Security notes
 
