@@ -20,9 +20,17 @@ UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
 HASH_INDEX = os.path.join(UPLOAD_DIR, '.hashes.json')
 
 ALLOWED_EXTS = {
+    '',  # extensionless files (e.g. Dockerfile, Makefile, raw dumps)
+    # text / config / source
     '.log', '.txt', '.md', '.json', '.csv', '.tsv',
     '.yaml', '.yml', '.ini', '.conf', '.cfg', '.toml',
     '.sh', '.py', '.js', '.ts', '.html', '.xml',
+    # images
+    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg', '.ico',
+    # audio
+    '.mp3', '.wav', '.flac', '.ogg', '.m4a', '.aac', '.opus',
+    # video
+    '.mp4', '.mov', '.avi', '.mkv', '.webm', '.m4v',
 }
 MAX_SIZE = 200 * 1024 * 1024  # 200MB
 SAFE_NAME_RE = re.compile(r'^[A-Za-z0-9._\-]+$')
@@ -193,7 +201,7 @@ class Handler(BaseHTTPRequestHandler):
 
         final = os.path.join(UPLOAD_DIR, name)
         if os.path.exists(final):
-            self._send(409, f'Filename already exists: {name}\n')
+            self._send(409, f'Duplicate filename: "{name}" already exists on the server\n')
             # drain request body so curl sees the response cleanly
             self._drain(length)
             return
@@ -219,7 +227,7 @@ class Handler(BaseHTTPRequestHandler):
             if length > 0 and digest in hashes:
                 existing = hashes[digest]
                 os.remove(tmp)
-                self._send(409, f'Duplicate content: same file already uploaded as "{existing}"\n')
+                self._send(409, f'Duplicate content: identical file already exists as "{existing}"\n')
                 return
 
             os.rename(tmp, final)

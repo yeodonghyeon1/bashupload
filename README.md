@@ -68,16 +68,23 @@ alias bashup='curl -T'   # usage: bashup app.log http://HOST:16261/
 Every uploaded file is hashed with SHA-256. The server returns HTTP 409 in
 either of these cases:
 
-- A file with the same name already exists, **or**
+- A file with the same name already exists
+  → `Duplicate filename: "<name>" already exists on the server`
 - A file with the same content (hash) already exists, even under a
   different name
+  → `Duplicate content: identical file already exists as "<existing>"`
 
-The response body explains which condition triggered the rejection and
-which existing file it conflicts with.
+The response body always names the existing file that caused the conflict.
 
 ## Allowed file types
 
-`.log .txt .md .json .csv .tsv .yaml .yml .ini .conf .cfg .toml .sh .py .js .ts .html .xml`
+- **No extension** — files without an extension (e.g. `Dockerfile`,
+  `Makefile`, raw dumps) are allowed
+- **Text / config / source**: `.log .txt .md .json .csv .tsv .yaml .yml
+  .ini .conf .cfg .toml .sh .py .js .ts .html .xml`
+- **Images**: `.jpg .jpeg .png .gif .webp .bmp .svg .ico`
+- **Audio**: `.mp3 .wav .flac .ogg .m4a .aac .opus`
+- **Video**: `.mp4 .mov .avi .mkv .webm .m4v`
 
 Edit `ALLOWED_EXTS` in `server.py` to change this list. Maximum upload
 size: 200 MB (`MAX_SIZE`).
